@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1024, initial-scale=1.0">
+<title>GM Railway — Engagement Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0e1a;
+    --surface:   #111827;
+    --card:      #161f30;
+    --border:    #1e2d45;
+    --gold:      #c9a84c;
+    --gold-lt:   #e8c96e;
+    --gold-dk:   #7a5c1e;
+    --red:       #e05252;
+    --green:     #4caf7d;
+    --blue:      #4f9cf0;
+    --muted:     #4a5a72;
+    --text:      #dce8f5;
+    --text-dim:  #7a90ab;
+    --rail:      #1e3a5f;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    width: 1024px;
+    min-height: 600px;
+    overflow-x: hidden;
+  }
+
+  /* ── TRACK DECORATION ── */
+  .track-top, .track-bottom {
+    height: 6px;
+    background: repeating-linear-gradient(90deg,
+      var(--gold) 0px, var(--gold) 24px,
+      transparent 24px, transparent 32px);
+    opacity: .55;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0d1929 0%, #0a1628 60%, #0e1f38 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 60% 120% at 80% 50%, rgba(201,168,76,.08) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .header-left { display:flex; align-items:center; gap:16px; }
+  .emblem {
+    width:52px; height:52px;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    background: radial-gradient(circle, #1a2d4a, #0d1829);
+    flex-shrink:0;
+    box-shadow: 0 0 18px rgba(201,168,76,.3);
+  }
+  .title-block h1 {
+    font-family:'Playfair Display', serif;
+    font-size:20px; font-weight:900;
+    color: var(--gold-lt);
+    letter-spacing:.03em;
+    line-height:1.1;
+  }
+  .title-block p {
+    font-size:10px; font-weight:500;
+    color: var(--text-dim);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    margin-top:3px;
+  }
+  .header-right { text-align:right; }
+  #clock {
+    font-family:'DM Mono', monospace;
+    font-size:26px; font-weight:500;
+    color: var(--gold-lt);
+    letter-spacing:.04em;
+  }
+  #date-display {
+    font-size:11px; color:var(--text-dim);
+    letter-spacing:.08em;
+    margin-top:2px;
+  }
+
+  /* ── MAIN GRID ── */
+  main {
+    padding: 18px 24px 12px;
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: auto 1fr;
+    gap: 14px;
+  }
+
+  /* ── SECTION LABELS ── */
+  .section-label {
+    font-size:9px; font-weight:600;
+    letter-spacing:.15em; text-transform:uppercase;
+    color: var(--gold);
+    margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-label::after {
+    content:''; flex:1; height:1px;
+    background: linear-gradient(90deg, var(--gold-dk), transparent);
+  }
+
+  /* ── TODAY PANEL ── */
+  .today-panel {
+    grid-column:1; grid-row:1;
+  }
+  .today-card {
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .today-header {
+    background: linear-gradient(90deg, var(--rail), #0d1829);
+    padding:10px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .today-date-badge {
+    background: var(--gold);
+    color: #0a0e1a;
+    font-family:'Playfair Display',serif;
+    font-size:28px; font-weight:900;
+    width:52px; height:52px;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .today-meta { margin-left:14px; }
+  .today-meta .day-name { font-size:15px; font-weight:600; color:var(--gold-lt); }
+  .today-meta .month-year { font-size:11px; color:var(--text-dim); letter-spacing:.06em; margin-top:2px; }
+  .today-stats { display:flex; gap:16px; margin-left:auto; }
+  .stat-pill {
+    text-align:center;
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--border);
+    border-radius:6px; padding:6px 12px;
+  }
+  .stat-pill .num { font-family:'DM Mono',monospace; font-size:18px; font-weight:500; color:var(--gold-lt); }
+  .stat-pill .lbl { font-size:9px; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; margin-top:1px; }
+
+  /* Today's engagements list */
+  .today-list { padding:12px 16px; max-height:190px; overflow-y:auto; }
+  .today-list::-webkit-scrollbar{width:3px;}
+  .today-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .engagement-row {
+    display:flex; align-items:flex-start; gap:12px;
+    padding:8px 10px; border-radius:7px;
+    margin-bottom:5px;
+    background:rgba(255,255,255,.02);
+    border-left:3px solid transparent;
+    transition:background .2s;
+  }
+  .engagement-row:hover { background:rgba(255,255,255,.05); }
+  .engagement-row.prio-high  { border-color:var(--red); }
+  .engagement-row.prio-med   { border-color:var(--gold); }
+  .engagement-row.prio-low   { border-color:var(--green); }
+  .eng-time {
+    font-family:'DM Mono',monospace;
+    font-size:11px; color:var(--gold);
+    white-space:nowrap; padding-top:1px;
+    min-width:42px;
+  }
+  .eng-body { flex:1; }
+  .eng-title { font-size:13px; font-weight:500; color:var(--text); line-height:1.3; }
+  .eng-sub   { font-size:10px; color:var(--text-dim); margin-top:2px; }
+  .eng-badge {
+    font-size:9px; font-weight:600; letter-spacing:.06em;
+    padding:2px 7px; border-radius:20px;
+    text-transform:uppercase; flex-shrink:0; align-self:flex-start; margin-top:2px;
+  }
+  .badge-meeting  { background:rgba(79,156,240,.18); color:var(--blue); }
+  .badge-visit    { background:rgba(76,175,125,.18); color:var(--green); }
+  .badge-conf     { background:rgba(201,168,76,.18); color:var(--gold-lt); }
+  .badge-review   { background:rgba(224,82,82,.18);  color:var(--red); }
+  .badge-other    { background:rgba(255,255,255,.08); color:var(--text-dim); }
+
+  .empty-state {
+    text-align:center; padding:30px 20px;
+    color:var(--muted); font-size:13px;
+  }
+  .empty-state .icon { font-size:28px; margin-bottom:8px; }
+
+  /* ── UPCOMING PANEL ── */
+  .upcoming-panel { grid-column:1; grid-row:2; }
+  .upcoming-list {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:8px;
+  }
+  .upcoming-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 12px;
+    position:relative; overflow:hidden;
+    cursor:default;
+    transition:border-color .2s, transform .15s;
+  }
+  .upcoming-card:hover { border-color:var(--gold-dk); transform:translateY(-1px); }
+  .upcoming-card .uc-date {
+    font-family:'Playfair Display',serif;
+    font-size:22px; font-weight:700; color:var(--gold);
+  }
+  .upcoming-card .uc-month { font-size:10px; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; }
+  .upcoming-card .uc-title { font-size:12px; font-weight:500; margin-top:6px; color:var(--text); line-height:1.3; }
+  .upcoming-card .uc-time  { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-dim); margin-top:4px; }
+  .upcoming-card .uc-stripe {
+    position:absolute; top:0; right:0;
+    width:4px; height:100%;
+    border-radius:0 8px 8px 0;
+  }
+
+  /* ── SIDE PANEL ── */
+  .side-panel { grid-column:2; grid-row:1 / span 2; display:flex; flex-direction:column; gap:14px; }
+
+  /* Mini calendar */
+  .mini-cal {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .mini-cal-header {
+    background: linear-gradient(90deg, #0f1e35, #121f38);
+    padding:10px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .mini-cal-header .mc-title {
+    font-family:'Playfair Display',serif;
+    font-size:14px; font-weight:700; color:var(--gold-lt);
+  }
+  .mc-grid { padding:10px 10px 12px; }
+  .mc-dow {
+    display:grid; grid-template-columns:repeat(7,1fr);
+    gap:2px; margin-bottom:6px;
+  }
+  .mc-dow span {
+    text-align:center; font-size:9px;
+    font-weight:600; letter-spacing:.06em;
+    color:var(--text-dim); text-transform:uppercase;
+  }
+  .mc-days { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .mc-day {
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-family:'DM Mono',monospace;
+    border-radius:4px; color:var(--text-dim);
+    cursor:default; position:relative;
+  }
+  .mc-day.other-month { color:var(--muted); opacity:.4; }
+  .mc-day.today { background:var(--gold); color:#0a0e1a; font-weight:700; border-radius:50%; }
+  .mc-day.has-event::after {
+    content:''; position:absolute; bottom:2px;
+    width:4px; height:4px; border-radius:50%;
+    background:var(--blue);
+  }
+  .mc-day.today.has-event::after { background:#0a0e1a; }
+  .mc-day.weekend:not(.today) { color:var(--gold-dk); }
+
+  /* Summary cards */
+  .summary-cards { display:flex; flex-direction:column; gap:8px; }
+  .sum-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .sum-icon { font-size:20px; flex-shrink:0; }
+  .sum-text .sum-num { font-family:'Playfair Display',serif; font-size:22px; color:var(--gold-lt); font-weight:700; }
+  .sum-text .sum-lbl { font-size:10px; color:var(--text-dim); letter-spacing:.06em; text-transform:uppercase; margin-top:1px; }
+
+  /* Import toolbar */
+  .import-bar {
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    padding:10px 24px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .import-bar label {
+    font-size:10px; color:var(--text-dim);
+    letter-spacing:.08em; text-transform:uppercase;
+  }
+  .import-bar input[type=text] {
+    flex:1; background:var(--card);
+    border:1px solid var(--border); border-radius:6px;
+    padding:6px 10px; font-size:12px; color:var(--text);
+    font-family:'DM Mono',monospace;
+    outline:none;
+  }
+  .import-bar input[type=text]:focus { border-color:var(--gold-dk); }
+  .btn {
+    background: linear-gradient(135deg, var(--gold-dk), var(--gold));
+    color:#0a0e1a; font-weight:700; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase;
+    padding:7px 16px; border-radius:6px; border:none;
+    cursor:pointer; transition:opacity .2s;
+    white-space:nowrap;
+  }
+  .btn:hover { opacity:.85; }
+  .btn-outline {
+    background:transparent;
+    color:var(--text-dim); font-weight:600; font-size:11px;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:7px 14px; border-radius:6px;
+    border:1px solid var(--border);
+    cursor:pointer; transition:border-color .2s, color .2s;
+    white-space:nowrap;
+  }
+  .btn-outline:hover { border-color:var(--gold-dk); color:var(--gold); }
+  #status-msg { font-size:11px; color:var(--text-dim); flex:0 0 auto; }
+
+  /* scrollbar global */
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div class="track-top"></div>
+
+<header>
+  <div class="header-left">
+    <div class="emblem">🚂</div>
+    <div class="title-block">
+      <h1>General Manager — Engagement Calendar</h1>
+      <p>Indian Railways &nbsp;•&nbsp; Office of the General Manager</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="clock">--:--:--</div>
+    <div id="date-display">Loading…</div>
+  </div>
+</header>
+
+<main>
+  <!-- TODAY -->
+  <div class="today-panel">
+    <div class="section-label">Today's Schedule</div>
+    <div class="today-card">
+      <div class="today-header">
+        <div class="today-date-badge" id="hdr-day">--</div>
+        <div class="today-meta">
+          <div class="day-name" id="hdr-dayname">---</div>
+          <div class="month-year" id="hdr-monthyr">---</div>
+        </div>
+        <div class="today-stats">
+          <div class="stat-pill">
+            <div class="num" id="stat-today">0</div>
+            <div class="lbl">Today</div>
+          </div>
+          <div class="stat-pill">
+            <div class="num" id="stat-week">0</div>
+            <div class="lbl">This Week</div>
+          </div>
+          <div class="stat-pill">
+            <div class="num" id="stat-month">0</div>
+            <div class="lbl">This Month</div>
+          </div>
+        </div>
+      </div>
+      <div class="today-list" id="today-list">
+        <div class="empty-state"><div class="icon">🗓️</div>No engagements loaded yet.<br>Import your Google Sheet CSV below.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPCOMING -->
+  <div class="upcoming-panel">
+    <div class="section-label">Upcoming Engagements</div>
+    <div class="upcoming-list" id="upcoming-list">
+      <div class="empty-state" style="grid-column:1/-1;color:var(--muted);font-size:12px;text-align:center;padding:20px;">
+        Import data to see upcoming events
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE -->
+  <div class="side-panel">
+    <!-- Mini calendar -->
+    <div class="mini-cal">
+      <div class="mini-cal-header">
+        <span class="mc-title" id="mc-title">Month Year</span>
+        <span style="font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace;" id="mc-count">— events</span>
+      </div>
+      <div class="mc-grid">
+        <div class="mc-dow">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+          <span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div class="mc-days" id="mc-days"></div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="section-label" style="margin-bottom:0">Monthly Overview</div>
+    <div class="summary-cards">
+      <div class="sum-card">
+        <div class="sum-icon">🤝</div>
+        <div class="sum-text">
+          <div class="sum-num" id="sum-meetings">0</div>
+          <div class="sum-lbl">Meetings</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🏗️</div>
+        <div class="sum-text">
+          <div class="sum-num" id="sum-visits">0</div>
+          <div class="sum-lbl">Site Visits</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">📋</div>
+        <div class="sum-text">
+          <div class="sum-num" id="sum-reviews">0</div>
+          <div class="sum-lbl">Reviews / Conf.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- IMPORT BAR -->
+<div class="import-bar">
+  <label>CSV URL</label>
+  <input type="text" id="csv-url" placeholder="Paste any Google Sheets URL (edit link, share link, or published CSV) — CORS proxy applied automatically">
+  <button class="btn" onclick="loadCSV()">⬇ Import</button>
+  <button class="btn-outline" onclick="loadSample()">Load Sample</button>
+  <span id="status-msg"></span>
+</div>
+
+<div class="track-bottom"></div>
+
+<script>
+// ── CLOCK ──────────────────────────────────────────────────────────────
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const SMONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function tickClock(){
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  document.getElementById('date-display').textContent =
+    `${DAYS[n.getDay()]}, ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
+}
+tickClock(); setInterval(tickClock,1000);
+
+// ── TODAY HEADER ──────────────────────────────────────────────────────
+const NOW = new Date();
+document.getElementById('hdr-day').textContent    = NOW.getDate();
+document.getElementById('hdr-dayname').textContent = DAYS[NOW.getDay()];
+document.getElementById('hdr-monthyr').textContent = `${MONTHS[NOW.getMonth()]} ${NOW.getFullYear()}`;
+
+// ── DATA STORE ────────────────────────────────────────────────────────
+let events = []; // [{date:Date, time, title, location, type, priority}]
+
+// ── CSV PARSER ───────────────────────────────────────────────────────
+// Expected columns (case-insensitive, any order):
+// Date | Time | Title | Location | Type | Priority
+function parseCSV(raw){
+  const lines = raw.split(/\r?\n/).filter(l => l.trim());
+  if(!lines.length) return [];
+  const header = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+  const idx = {
+    date:     header.findIndex(h => h==='date'),
+    time:     header.findIndex(h => h==='time'),
+    title:    header.findIndex(h => h.includes('title') || h.includes('engagement') || h.includes('subject')),
+    location: header.findIndex(h => h.includes('location') || h.includes('venue') || h.includes('place')),
+    type:     header.findIndex(h => h==='type' || h.includes('category')),
+    priority: header.findIndex(h => h.includes('priority')),
+  };
+  const parsed = [];
+  for(let i=1;i<lines.length;i++){
+    const cols = splitCSVLine(lines[i]);
+    const dateStr = idx.date>=0 ? cols[idx.date]?.replace(/"/g,'').trim() : '';
+    if(!dateStr) continue;
+    const d = parseDate(dateStr);
+    if(!d || isNaN(d)) continue;
+    parsed.push({
+      date:     d,
+      time:     idx.time>=0     ? (cols[idx.time]||'').replace(/"/g,'').trim()     : '',
+      title:    idx.title>=0    ? (cols[idx.title]||'').replace(/"/g,'').trim()    : 'Engagement',
+      location: idx.location>=0 ? (cols[idx.location]||'').replace(/"/g,'').trim(): '',
+      type:     idx.type>=0     ? (cols[idx.type]||'').replace(/"/g,'').trim()     : 'Other',
+      priority: idx.priority>=0 ? (cols[idx.priority]||'').replace(/"/g,'').trim().toLowerCase() : 'med',
+    });
+  }
+  return parsed;
+}
+
+function splitCSVLine(line){
+  const result=[]; let cur=''; let inQ=false;
+  for(let c of line){
+    if(c==='"'){inQ=!inQ;}
+    else if(c===',' && !inQ){result.push(cur);cur='';}
+    else{cur+=c;}
+  }
+  result.push(cur); return result;
+}
+
+function parseDate(s){
+  // Supports: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, MM/DD/YYYY
+  s = s.trim();
+  let m;
+  if((m=s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/))){
+    // Try DD/MM/YYYY first (Indian format)
+    const d=new Date(+m[3],+m[2]-1,+m[1]);
+    if(!isNaN(d)) return d;
+  }
+  if((m=s.match(/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})$/))){
+    return new Date(+m[1],+m[2]-1,+m[3]);
+  }
+  return new Date(s);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+function sameMonth(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth(); }
+function startOfWeek(d){ const c=new Date(d); c.setDate(c.getDate()-c.getDay()); return c; }
+function endOfWeek(d){ const c=new Date(d); c.setDate(c.getDate()+(6-c.getDay())); return c; }
+
+function typeClass(t){
+  const tl=(t||'').toLowerCase();
+  if(tl.includes('meet')) return 'badge-meeting';
+  if(tl.includes('visit')||tl.includes('inspect')) return 'badge-visit';
+  if(tl.includes('conf')||tl.includes('seminar')||tl.includes('workshop')) return 'badge-conf';
+  if(tl.includes('review')||tl.includes('audit')) return 'badge-review';
+  return 'badge-other';
+}
+function prioClass(p){ const pl=(p||'').toLowerCase(); if(pl==='high') return 'prio-high'; if(pl==='low') return 'prio-low'; return 'prio-med'; }
+function stripeColor(t){ const tl=(t||'').toLowerCase(); if(tl.includes('visit')||tl.includes('inspect')) return 'var(--green)'; if(tl.includes('conf')||tl.includes('seminar')) return 'var(--gold)'; if(tl.includes('review')||tl.includes('audit')) return 'var(--red)'; return 'var(--blue)'; }
+
+function renderAll(){
+  const today = NOW;
+  const todayEvts = events.filter(e=>sameDay(e.date,today)).sort((a,b)=>a.time.localeCompare(b.time));
+  const ws=startOfWeek(today), we=endOfWeek(today);
+  const weekEvts  = events.filter(e=>e.date>=ws && e.date<=we);
+  const monthEvts = events.filter(e=>sameMonth(e.date,today));
+
+  // Stats
+  document.getElementById('stat-today').textContent = todayEvts.length;
+  document.getElementById('stat-week').textContent  = weekEvts.length;
+  document.getElementById('stat-month').textContent = monthEvts.length;
+
+  // Today list
+  const tl = document.getElementById('today-list');
+  if(!todayEvts.length){
+    tl.innerHTML='<div class="empty-state"><div class="icon">✅</div>No engagements scheduled today.</div>';
+  } else {
+    tl.innerHTML = todayEvts.map(e=>`
+      <div class="engagement-row ${prioClass(e.priority)}">
+        <div class="eng-time">${e.time||'--:--'}</div>
+        <div class="eng-body">
+          <div class="eng-title">${e.title}</div>
+          ${e.location?`<div class="eng-sub">📍 ${e.location}</div>`:''}
+        </div>
+        <span class="eng-badge ${typeClass(e.type)}">${e.type||'Other'}</span>
+      </div>`).join('');
+  }
+
+  // Upcoming (next 6 events after today)
+  const upcoming = events.filter(e=>e.date>today && !sameDay(e.date,today))
+    .sort((a,b)=>a.date-b.date || a.time.localeCompare(b.time)).slice(0,6);
+  const ul = document.getElementById('upcoming-list');
+  if(!upcoming.length){
+    ul.innerHTML='<div class="empty-state" style="grid-column:1/-1;color:var(--muted);font-size:12px;text-align:center;padding:20px;">No upcoming engagements</div>';
+  } else {
+    ul.innerHTML = upcoming.map(e=>`
+      <div class="upcoming-card">
+        <div class="uc-stripe" style="background:${stripeColor(e.type)}"></div>
+        <div class="uc-date">${e.date.getDate()}</div>
+        <div class="uc-month">${SMONTH[e.date.getMonth()]} ${e.date.getFullYear()}</div>
+        <div class="uc-title">${e.title}</div>
+        <div class="uc-time">${e.time||'Time TBD'} ${e.location?'• '+e.location:''}</div>
+      </div>`).join('');
+  }
+
+  // Summary
+  document.getElementById('sum-meetings').textContent = monthEvts.filter(e=>(e.type||'').toLowerCase().includes('meet')).length;
+  document.getElementById('sum-visits').textContent   = monthEvts.filter(e=>{const t=(e.type||'').toLowerCase();return t.includes('visit')||t.includes('inspect');}).length;
+  document.getElementById('sum-reviews').textContent  = monthEvts.filter(e=>{const t=(e.type||'').toLowerCase();return t.includes('review')||t.includes('conf')||t.includes('seminar')||t.includes('audit');}).length;
+
+  // Mini calendar
+  renderMiniCal(today, monthEvts);
+}
+
+function renderMiniCal(today, monthEvts){
+  document.getElementById('mc-title').textContent = `${MONTHS[today.getMonth()]} ${today.getFullYear()}`;
+  document.getElementById('mc-count').textContent = `${monthEvts.length} event${monthEvts.length!==1?'s':''}`;
+  const eventDays = new Set(monthEvts.map(e=>e.date.getDate()));
+  const first = new Date(today.getFullYear(), today.getMonth(), 1);
+  const last  = new Date(today.getFullYear(), today.getMonth()+1, 0);
+  let html='';
+  // Leading blanks
+  for(let i=0;i<first.getDay();i++) html+=`<div class="mc-day other-month"></div>`;
+  for(let d=1;d<=last.getDate();d++){
+    const isToday = d===today.getDate();
+    const hasEvt  = eventDays.has(d);
+    const isWknd  = [0,6].includes(new Date(today.getFullYear(),today.getMonth(),d).getDay());
+    html+=`<div class="mc-day${isToday?' today':''}${hasEvt?' has-event':''}${isWknd?' weekend':''}">${d}</div>`;
+  }
+  document.getElementById('mc-days').innerHTML=html;
+}
+
+// ── LOAD CSV ──────────────────────────────────────────────────────────
+function setStatus(msg, ok=true){ const el=document.getElementById('status-msg'); el.textContent=msg; el.style.color=ok?'var(--green)':'var(--red)'; }
+
+// CORS proxy list — tried in order until one works
+const PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://cors-anywhere.herokuapp.com/${url}`,
+];
+
+async function fetchWithCORS(rawUrl){
+  // 1. Try direct first (works when served from a real server)
+  try {
+    const r = await fetch(rawUrl, {signal: AbortSignal.timeout(5000)});
+    if(r.ok) return await r.text();
+  } catch(_){}
+
+  // 2. Try each proxy
+  for(const proxy of PROXIES){
+    try {
+      const r = await fetch(proxy(rawUrl), {signal: AbortSignal.timeout(8000)});
+      if(r.ok){
+        const text = await r.text();
+        // allorigins wraps JSON sometimes — unwrap if needed
+        if(text.trim().startsWith('{"contents"')){
+          return JSON.parse(text).contents;
+        }
+        return text;
+      }
+    } catch(_){}
+  }
+  throw new Error('All fetch attempts failed. Check the URL is a public published CSV link.');
+}
+
+async function loadCSV(){
+  const rawUrl = document.getElementById('csv-url').value.trim();
+  if(!rawUrl){ setStatus('Please enter a CSV URL', false); return; }
+
+  // Auto-convert "edit" Google Sheets URL → CSV export URL
+  const url = convertGSheetUrl(rawUrl);
+
+  setStatus('⏳ Fetching data…');
+  try {
+    const text = await fetchWithCORS(url);
+    events = parseCSV(text);
+    if(!events.length){ setStatus('⚠ No valid rows found — check column headers', false); return; }
+    renderAll();
+    setStatus(`✓ Loaded ${events.length} engagements`);
+  } catch(e){
+    setStatus(`✗ ${e.message}`, false);
+  }
+}
+
+// Convert regular Google Sheets share/edit URL to CSV export URL automatically
+function convertGSheetUrl(url){
+  // Already a CSV export or published link — leave as-is
+  if(url.includes('output=csv') || url.includes('pub?') || url.includes('corsproxy') || url.includes('allorigins')) return url;
+  // Pattern: https://docs.google.com/spreadsheets/d/SHEET_ID/edit...
+  const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if(m){
+    const gid = (url.match(/[#&?]gid=(\d+)/)||[])[1] || '0';
+    return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
+  }
+  return url;
+}
+
+// ── SAMPLE DATA ───────────────────────────────────────────────────────
+function loadSample(){
+  const y=NOW.getFullYear(), m=NOW.getMonth();
+  const d=(n,h=0,mi=0)=>new Date(y,m,n,h,mi);
+  events=[
+    {date:d(NOW.getDate(),9,30),  time:'09:30',title:'Divisional Managers Briefing',location:'Conference Room A, HQ',type:'Meeting',priority:'high'},
+    {date:d(NOW.getDate(),11,0),  time:'11:00',title:'Infrastructure Review — Goods Shed Modernisation',location:'Yard Office',type:'Review',priority:'high'},
+    {date:d(NOW.getDate(),14,0),  time:'14:00',title:'Parliamentary Committee Interaction (Virtual)',location:'Video Conference',type:'Conference',priority:'med'},
+    {date:d(NOW.getDate(),16,30), time:'16:30',title:'Press Briefing — New Train Services',location:'Media Centre',type:'Other',priority:'med'},
+    {date:d(NOW.getDate()+1,10,0),time:'10:00',title:'Site Visit — Platform Expansion, Ambala',location:'Ambala Station',type:'Site Visit',priority:'high'},
+    {date:d(NOW.getDate()+2,9,0), time:'09:00',title:'Safety Audit — Loco Maintenance Depot',location:'Ludhiana Depot',type:'Review',priority:'high'},
+    {date:d(NOW.getDate()+3,11,30),time:'11:30',title:'Staff Welfare Meeting',location:'Training Institute, Chandigarh',type:'Meeting',priority:'low'},
+    {date:d(NOW.getDate()+4,9,0), time:'09:00',title:'Zonal Railway Conference, New Delhi',location:'Rail Bhawan, New Delhi',type:'Conference',priority:'high'},
+    {date:d(NOW.getDate()+5,15,0),time:'15:00',title:'Inauguration — Passenger Amenities Upgrade',location:'Jalandhar City Station',type:'Site Visit',priority:'med'},
+    {date:d(NOW.getDate()+7,10,30),time:'10:30',title:'Review of Revenue Performance — Q3',location:'HQ Board Room',type:'Review',priority:'high'},
+    {date:d(NOW.getDate()+9,14,0),time:'14:00',title:'Workshop: Cybersecurity in Railway IT',location:'IRISET, Secunderabad',type:'Conference',priority:'low'},
+    {date:d(NOW.getDate()+12,9,0),time:'09:00',title:'Bridge Inspection — Beas River',location:'Beas, Punjab',type:'Site Visit',priority:'med'},
+    {date:d(NOW.getDate()-2,11,0),time:'11:00',title:'CRB Video Conference',location:'Video Conference',type:'Meeting',priority:'high'},
+  ];
+  renderAll();
+  setStatus(`✓ Sample data loaded (${events.length} engagements)`);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+renderAll(); // renders empty state
+</script>
+</body>
+</html>
