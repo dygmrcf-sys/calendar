@@ -3,27 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1024, initial-scale=1.0">
-<title>GM Railway — Engagement Calendar</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Engagement Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:        #0a0e1a;
-    --surface:   #111827;
-    --card:      #161f30;
-    --border:    #1e2d45;
-    --gold:      #c9a84c;
-    --gold-lt:   #e8c96e;
-    --gold-dk:   #7a5c1e;
-    --red:       #e05252;
-    --green:     #4caf7d;
-    --blue:      #4f9cf0;
-    --muted:     #4a5a72;
-    --text:      #dce8f5;
-    --text-dim:  #7a90ab;
-    --rail:      #1e3a5f;
+    --bg:        #f4f1eb;
+    --surface:   #faf8f4;
+    --card:      #ffffff;
+    --border:    #e2ddd6;
+    --border-dk: #c8c0b4;
+    --gold:      #8c6d2f;
+    --gold-lt:   #b8893c;
+    --gold-dk:   #5c4518;
+    --gold-bg:   #f9f3e8;
+    --red:       #c0392b;
+    --red-bg:    #fdf0ee;
+    --green:     #2e7d5e;
+    --green-bg:  #eef7f3;
+    --blue:      #2563a8;
+    --blue-bg:   #eef4fc;
+    --muted:     #a09888;
+    --text:      #2a2420;
+    --text-dim:  #7a6e64;
+    --text-sub:  #9e9288;
+    --rail:      #2a3f5f;
+    --shadow:    0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.07);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
+
+  /* ── PAGE CENTERING FIX ── */
+  html {
+    background: #e8e4dc;
+    min-height: 100%;
+  }
 
   body {
     background: var(--bg);
@@ -32,55 +46,53 @@
     width: 1024px;
     min-height: 600px;
     overflow-x: hidden;
+    margin: 0 auto; /* CENTER ON PAGE */
+    box-shadow: 0 0 40px rgba(0,0,0,0.15);
   }
 
-  /* ── TRACK DECORATION ── */
-  .track-top, .track-bottom {
-    height: 6px;
+  /* ── TRACK ── */
+  .track-top {
+    height: 5px;
+    background: linear-gradient(90deg, var(--gold-dk), var(--gold-lt), var(--gold-dk));
+  }
+  .track-stripe {
+    height: 3px;
     background: repeating-linear-gradient(90deg,
-      var(--gold) 0px, var(--gold) 24px,
-      transparent 24px, transparent 32px);
-    opacity: .55;
+      var(--rail) 0px, var(--rail) 20px,
+      transparent 20px, transparent 28px);
+    opacity: .25;
   }
 
   /* ── HEADER ── */
   header {
-    background: linear-gradient(135deg, #0d1929 0%, #0a1628 60%, #0e1f38 100%);
+    background: var(--card);
     border-bottom: 1px solid var(--border);
-    padding: 18px 32px 14px;
+    padding: 16px 32px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
-    overflow: hidden;
+    box-shadow: var(--shadow-sm);
   }
-  header::before {
-    content:'';
-    position:absolute; inset:0;
-    background: radial-gradient(ellipse 60% 120% at 80% 50%, rgba(201,168,76,.08) 0%, transparent 70%);
-    pointer-events:none;
-  }
-  .header-left { display:flex; align-items:center; gap:16px; }
+  .header-left { display:flex; align-items:center; gap:14px; }
   .emblem {
-    width:52px; height:52px;
+    width:48px; height:48px;
     border:2px solid var(--gold);
     border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    font-size:22px;
-    background: radial-gradient(circle, #1a2d4a, #0d1829);
+    font-size:20px;
+    background: var(--gold-bg);
     flex-shrink:0;
-    box-shadow: 0 0 18px rgba(201,168,76,.3);
   }
   .title-block h1 {
     font-family:'Playfair Display', serif;
-    font-size:20px; font-weight:900;
-    color: var(--gold-lt);
-    letter-spacing:.03em;
+    font-size:18px; font-weight:900;
+    color: var(--text);
+    letter-spacing:.01em;
     line-height:1.1;
   }
   .title-block p {
     font-size:10px; font-weight:500;
-    color: var(--text-dim);
+    color: var(--text-sub);
     letter-spacing:.12em;
     text-transform:uppercase;
     margin-top:3px;
@@ -88,117 +100,134 @@
   .header-right { text-align:right; }
   #clock {
     font-family:'DM Mono', monospace;
-    font-size:26px; font-weight:500;
-    color: var(--gold-lt);
+    font-size:24px; font-weight:500;
+    color: var(--text);
     letter-spacing:.04em;
   }
   #date-display {
-    font-size:11px; color:var(--text-dim);
-    letter-spacing:.08em;
+    font-size:11px; color:var(--text-sub);
+    letter-spacing:.06em;
     margin-top:2px;
+  }
+  .sync-status {
+    font-size:10px; color:var(--muted);
+    margin-top:3px; letter-spacing:.04em;
+  }
+  .sync-dot {
+    display:inline-block; width:6px; height:6px;
+    border-radius:50%; background:var(--green);
+    margin-right:4px; vertical-align:middle;
+    animation: pulse 2s infinite;
+  }
+  .sync-dot.syncing { background:var(--gold-lt); animation:spin-dot 1s linear infinite; }
+  .sync-dot.error   { background:var(--red); animation:none; }
+  @keyframes pulse {
+    0%,100%{ opacity:1; } 50%{ opacity:.4; }
   }
 
   /* ── MAIN GRID ── */
   main {
-    padding: 18px 24px 12px;
+    padding: 16px 22px 10px;
     display:grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr 288px;
     grid-template-rows: auto 1fr;
     gap: 14px;
   }
 
   /* ── SECTION LABELS ── */
   .section-label {
-    font-size:9px; font-weight:600;
-    letter-spacing:.15em; text-transform:uppercase;
+    font-size:9px; font-weight:700;
+    letter-spacing:.18em; text-transform:uppercase;
     color: var(--gold);
     margin-bottom:8px;
     display:flex; align-items:center; gap:8px;
   }
   .section-label::after {
     content:''; flex:1; height:1px;
-    background: linear-gradient(90deg, var(--gold-dk), transparent);
+    background: linear-gradient(90deg, var(--border-dk), transparent);
   }
 
   /* ── TODAY PANEL ── */
-  .today-panel {
-    grid-column:1; grid-row:1;
-  }
+  .today-panel { grid-column:1; grid-row:1; }
   .today-card {
     background: var(--card);
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:12px;
     overflow:hidden;
+    box-shadow: var(--shadow);
   }
   .today-header {
-    background: linear-gradient(90deg, var(--rail), #0d1829);
-    padding:10px 16px;
-    display:flex; align-items:center; justify-content:space-between;
+    background: linear-gradient(90deg, var(--rail) 0%, #1e3050 100%);
+    padding:12px 18px;
+    display:flex; align-items:center; gap:0;
   }
   .today-date-badge {
-    background: var(--gold);
-    color: #0a0e1a;
+    background: var(--gold-lt);
+    color: #fff;
     font-family:'Playfair Display',serif;
-    font-size:28px; font-weight:900;
-    width:52px; height:52px;
+    font-size:26px; font-weight:900;
+    width:50px; height:50px;
     border-radius:8px;
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
   }
   .today-meta { margin-left:14px; }
-  .today-meta .day-name { font-size:15px; font-weight:600; color:var(--gold-lt); }
-  .today-meta .month-year { font-size:11px; color:var(--text-dim); letter-spacing:.06em; margin-top:2px; }
-  .today-stats { display:flex; gap:16px; margin-left:auto; }
+  .today-meta .day-name { font-size:14px; font-weight:600; color:#fff; }
+  .today-meta .month-year { font-size:10px; color:rgba(255,255,255,.55); letter-spacing:.06em; margin-top:2px; }
+  .today-stats { display:flex; gap:10px; margin-left:auto; }
   .stat-pill {
     text-align:center;
-    background:rgba(255,255,255,.04);
-    border:1px solid var(--border);
-    border-radius:6px; padding:6px 12px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:8px; padding:6px 14px;
   }
-  .stat-pill .num { font-family:'DM Mono',monospace; font-size:18px; font-weight:500; color:var(--gold-lt); }
-  .stat-pill .lbl { font-size:9px; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; margin-top:1px; }
+  .stat-pill .num { font-family:'DM Mono',monospace; font-size:18px; font-weight:500; color:#fff; }
+  .stat-pill .lbl { font-size:9px; color:rgba(255,255,255,.5); letter-spacing:.08em; text-transform:uppercase; margin-top:1px; }
 
-  /* Today's engagements list */
-  .today-list { padding:12px 16px; max-height:190px; overflow-y:auto; }
+  /* Today's list */
+  .today-list { padding:10px 14px; max-height:188px; overflow-y:auto; }
   .today-list::-webkit-scrollbar{width:3px;}
-  .today-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .today-list::-webkit-scrollbar-thumb{background:var(--border-dk);border-radius:3px;}
+
   .engagement-row {
-    display:flex; align-items:flex-start; gap:12px;
-    padding:8px 10px; border-radius:7px;
-    margin-bottom:5px;
-    background:rgba(255,255,255,.02);
+    display:flex; align-items:flex-start; gap:10px;
+    padding:8px 10px; border-radius:8px;
+    margin-bottom:4px;
     border-left:3px solid transparent;
-    transition:background .2s;
+    transition:background .15s;
   }
-  .engagement-row:hover { background:rgba(255,255,255,.05); }
+  .engagement-row:hover { background:var(--bg); }
   .engagement-row.prio-high  { border-color:var(--red); }
-  .engagement-row.prio-med   { border-color:var(--gold); }
+  .engagement-row.prio-med   { border-color:var(--gold-lt); }
   .engagement-row.prio-low   { border-color:var(--green); }
+
   .eng-time {
     font-family:'DM Mono',monospace;
     font-size:11px; color:var(--gold);
-    white-space:nowrap; padding-top:1px;
+    white-space:nowrap; padding-top:2px;
     min-width:42px;
   }
   .eng-body { flex:1; }
   .eng-title { font-size:13px; font-weight:500; color:var(--text); line-height:1.3; }
-  .eng-sub   { font-size:10px; color:var(--text-dim); margin-top:2px; }
+  .eng-sub   { font-size:10px; color:var(--text-sub); margin-top:2px; }
   .eng-badge {
-    font-size:9px; font-weight:600; letter-spacing:.06em;
-    padding:2px 7px; border-radius:20px;
-    text-transform:uppercase; flex-shrink:0; align-self:flex-start; margin-top:2px;
+    font-size:9px; font-weight:600; letter-spacing:.05em;
+    padding:2px 8px; border-radius:20px;
+    text-transform:uppercase; flex-shrink:0;
+    align-self:flex-start; margin-top:2px;
+    border:1px solid;
   }
-  .badge-meeting  { background:rgba(79,156,240,.18); color:var(--blue); }
-  .badge-visit    { background:rgba(76,175,125,.18); color:var(--green); }
-  .badge-conf     { background:rgba(201,168,76,.18); color:var(--gold-lt); }
-  .badge-review   { background:rgba(224,82,82,.18);  color:var(--red); }
-  .badge-other    { background:rgba(255,255,255,.08); color:var(--text-dim); }
+  .badge-meeting  { background:var(--blue-bg);  color:var(--blue);  border-color:#ccdff6; }
+  .badge-visit    { background:var(--green-bg); color:var(--green); border-color:#c2e5d6; }
+  .badge-conf     { background:var(--gold-bg);  color:var(--gold);  border-color:#e8d9ba; }
+  .badge-review   { background:var(--red-bg);   color:var(--red);   border-color:#f2c8c4; }
+  .badge-other    { background:var(--bg);        color:var(--muted); border-color:var(--border); }
 
   .empty-state {
-    text-align:center; padding:30px 20px;
-    color:var(--muted); font-size:13px;
+    text-align:center; padding:28px 20px;
+    color:var(--muted); font-size:12px;
   }
-  .empty-state .icon { font-size:28px; margin-bottom:8px; }
+  .empty-state .icon { font-size:26px; margin-bottom:8px; }
 
   /* ── UPCOMING PANEL ── */
   .upcoming-panel { grid-column:1; grid-row:2; }
@@ -208,149 +237,158 @@
     gap:8px;
   }
   .upcoming-card {
-    background:var(--card);
+    background: var(--card);
     border:1px solid var(--border);
-    border-radius:8px;
-    padding:10px 12px;
+    border-radius:10px;
+    padding:10px 12px 10px 14px;
     position:relative; overflow:hidden;
     cursor:default;
-    transition:border-color .2s, transform .15s;
+    box-shadow: var(--shadow-sm);
+    transition:box-shadow .2s, transform .15s, border-color .2s;
   }
-  .upcoming-card:hover { border-color:var(--gold-dk); transform:translateY(-1px); }
+  .upcoming-card:hover { box-shadow:var(--shadow); transform:translateY(-1px); border-color:var(--border-dk); }
+  .upcoming-card .uc-stripe {
+    position:absolute; top:0; left:0;
+    width:4px; height:100%;
+    border-radius:10px 0 0 10px;
+  }
   .upcoming-card .uc-date {
     font-family:'Playfair Display',serif;
-    font-size:22px; font-weight:700; color:var(--gold);
+    font-size:22px; font-weight:700; color:var(--text);
   }
-  .upcoming-card .uc-month { font-size:10px; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; }
+  .upcoming-card .uc-month { font-size:10px; color:var(--text-sub); letter-spacing:.08em; text-transform:uppercase; }
   .upcoming-card .uc-title { font-size:12px; font-weight:500; margin-top:6px; color:var(--text); line-height:1.3; }
-  .upcoming-card .uc-time  { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-dim); margin-top:4px; }
-  .upcoming-card .uc-stripe {
-    position:absolute; top:0; right:0;
-    width:4px; height:100%;
-    border-radius:0 8px 8px 0;
-  }
+  .upcoming-card .uc-time  { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-sub); margin-top:4px; }
 
   /* ── SIDE PANEL ── */
-  .side-panel { grid-column:2; grid-row:1 / span 2; display:flex; flex-direction:column; gap:14px; }
+  .side-panel { grid-column:2; grid-row:1 / span 2; display:flex; flex-direction:column; gap:12px; }
 
   /* Mini calendar */
   .mini-cal {
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:12px;
     overflow:hidden;
     flex-shrink:0;
+    box-shadow: var(--shadow);
   }
   .mini-cal-header {
-    background: linear-gradient(90deg, #0f1e35, #121f38);
+    background: var(--gold-bg);
+    border-bottom:1px solid var(--border);
     padding:10px 14px;
     display:flex; align-items:center; justify-content:space-between;
   }
   .mini-cal-header .mc-title {
     font-family:'Playfair Display',serif;
-    font-size:14px; font-weight:700; color:var(--gold-lt);
+    font-size:14px; font-weight:700; color:var(--text);
+  }
+  .mc-count-badge {
+    font-size:10px; color:var(--gold);
+    font-family:'DM Mono',monospace;
+    background:rgba(140,109,47,.1);
+    border:1px solid rgba(140,109,47,.2);
+    padding:2px 8px; border-radius:20px;
   }
   .mc-grid { padding:10px 10px 12px; }
   .mc-dow {
     display:grid; grid-template-columns:repeat(7,1fr);
-    gap:2px; margin-bottom:6px;
+    gap:2px; margin-bottom:4px;
   }
   .mc-dow span {
     text-align:center; font-size:9px;
-    font-weight:600; letter-spacing:.06em;
-    color:var(--text-dim); text-transform:uppercase;
+    font-weight:700; letter-spacing:.08em;
+    color:var(--text-sub); text-transform:uppercase;
+    padding:3px 0;
   }
   .mc-days { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
   .mc-day {
     aspect-ratio:1; display:flex; align-items:center; justify-content:center;
     font-size:11px; font-family:'DM Mono',monospace;
-    border-radius:4px; color:var(--text-dim);
+    border-radius:6px; color:var(--text-dim);
     cursor:default; position:relative;
+    transition:background .15s;
   }
-  .mc-day.other-month { color:var(--muted); opacity:.4; }
-  .mc-day.today { background:var(--gold); color:#0a0e1a; font-weight:700; border-radius:50%; }
+  .mc-day:hover:not(.other-month):not(.today) { background:var(--bg); }
+  .mc-day.other-month { color:var(--border-dk); }
+  .mc-day.today { background:var(--rail); color:#fff; font-weight:700; border-radius:6px; }
   .mc-day.has-event::after {
     content:''; position:absolute; bottom:2px;
     width:4px; height:4px; border-radius:50%;
-    background:var(--blue);
+    background:var(--gold-lt);
   }
-  .mc-day.today.has-event::after { background:#0a0e1a; }
-  .mc-day.weekend:not(.today) { color:var(--gold-dk); }
+  .mc-day.today.has-event::after { background:rgba(255,255,255,.6); }
+  .mc-day.weekend:not(.today) { color:var(--gold); }
 
   /* Summary cards */
-  .summary-cards { display:flex; flex-direction:column; gap:8px; }
+  .summary-cards { display:flex; flex-direction:column; gap:6px; }
   .sum-card {
     background:var(--card);
     border:1px solid var(--border);
     border-radius:8px;
-    padding:12px 14px;
-    display:flex; align-items:center; gap:12px;
+    padding:10px 12px;
+    display:flex; align-items:center; gap:10px;
+    box-shadow: var(--shadow-sm);
   }
-  .sum-icon { font-size:20px; flex-shrink:0; }
-  .sum-text .sum-num { font-family:'Playfair Display',serif; font-size:22px; color:var(--gold-lt); font-weight:700; }
-  .sum-text .sum-lbl { font-size:10px; color:var(--text-dim); letter-spacing:.06em; text-transform:uppercase; margin-top:1px; }
+  .sum-icon { font-size:18px; flex-shrink:0; }
+  .sum-text .sum-num { font-family:'Playfair Display',serif; font-size:20px; color:var(--text); font-weight:700; }
+  .sum-text .sum-lbl { font-size:10px; color:var(--text-sub); letter-spacing:.06em; text-transform:uppercase; margin-top:1px; }
 
-  /* Import toolbar */
-  .import-bar {
-    background:var(--surface);
+  /* bottom bar */
+  .bottom-bar {
+    background: var(--card);
     border-top:1px solid var(--border);
-    padding:10px 24px;
-    display:flex; align-items:center; gap:12px;
+    padding:8px 22px;
+    display:flex; align-items:center; gap:10px;
+    font-size:11px;
+    color: var(--text-sub);
   }
-  .import-bar label {
-    font-size:10px; color:var(--text-dim);
-    letter-spacing:.08em; text-transform:uppercase;
-  }
-  .import-bar input[type=text] {
-    flex:1; background:var(--card);
-    border:1px solid var(--border); border-radius:6px;
-    padding:6px 10px; font-size:12px; color:var(--text);
+  .bottom-bar .reload-info {
+    margin-left:auto;
     font-family:'DM Mono',monospace;
-    outline:none;
+    font-size:10px;
+    color:var(--muted);
   }
-  .import-bar input[type=text]:focus { border-color:var(--gold-dk); }
-  .btn {
-    background: linear-gradient(135deg, var(--gold-dk), var(--gold));
-    color:#0a0e1a; font-weight:700; font-size:11px;
-    letter-spacing:.08em; text-transform:uppercase;
-    padding:7px 16px; border-radius:6px; border:none;
-    cursor:pointer; transition:opacity .2s;
-    white-space:nowrap;
-  }
-  .btn:hover { opacity:.85; }
-  .btn-outline {
-    background:transparent;
-    color:var(--text-dim); font-weight:600; font-size:11px;
+  .btn-sm {
+    background: var(--gold-bg);
+    color: var(--gold-dk); font-weight:700; font-size:10px;
     letter-spacing:.06em; text-transform:uppercase;
-    padding:7px 14px; border-radius:6px;
-    border:1px solid var(--border);
-    cursor:pointer; transition:border-color .2s, color .2s;
-    white-space:nowrap;
+    padding:5px 12px; border-radius:6px;
+    border:1px solid rgba(140,109,47,.3);
+    cursor:pointer; transition:background .2s;
   }
-  .btn-outline:hover { border-color:var(--gold-dk); color:var(--gold); }
-  #status-msg { font-size:11px; color:var(--text-dim); flex:0 0 auto; }
+  .btn-sm:hover { background:#f0e4c8; }
 
-  /* scrollbar global */
   ::-webkit-scrollbar{width:4px;height:4px;}
   ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  ::-webkit-scrollbar-thumb{background:var(--border-dk);border-radius:4px;}
 </style>
 </head>
 <body>
 
+<!-- ★ CONFIGURE YOUR GOOGLE SHEET URL HERE ★ -->
+<script>
+  // Paste your Google Sheet URL here (edit link, share link, or published CSV).
+  // The app will auto-convert it and reload every 10 minutes.
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/1sj4pPxk0cLVsJ12aUXnytWJuw1sxUVSRD2MOK4hTgAU/edit?gid=0#gid=0";
+</script>
+
 <div class="track-top"></div>
+<div class="track-stripe"></div>
 
 <header>
   <div class="header-left">
-    <div class="emblem">🚂</div>
     <div class="title-block">
-      <h1>General Manager — Engagement Calendar</h1>
-      <p>Indian Railways &nbsp;•&nbsp; Office of the General Manager</p>
+      <h1>Engagement Schedule</h1>
+      <p>GM Office, RCF Kapurthala</p>
     </div>
   </div>
   <div class="header-right">
     <div id="clock">--:--:--</div>
     <div id="date-display">Loading…</div>
+    <div class="sync-status">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-label">Initialising…</span>
+    </div>
   </div>
 </header>
 
@@ -366,22 +404,13 @@
           <div class="month-year" id="hdr-monthyr">---</div>
         </div>
         <div class="today-stats">
-          <div class="stat-pill">
-            <div class="num" id="stat-today">0</div>
-            <div class="lbl">Today</div>
-          </div>
-          <div class="stat-pill">
-            <div class="num" id="stat-week">0</div>
-            <div class="lbl">This Week</div>
-          </div>
-          <div class="stat-pill">
-            <div class="num" id="stat-month">0</div>
-            <div class="lbl">This Month</div>
-          </div>
+          <div class="stat-pill"><div class="num" id="stat-today">0</div><div class="lbl">Today</div></div>
+          <div class="stat-pill"><div class="num" id="stat-week">0</div><div class="lbl">This Week</div></div>
+          <div class="stat-pill"><div class="num" id="stat-month">0</div><div class="lbl">This Month</div></div>
         </div>
       </div>
       <div class="today-list" id="today-list">
-        <div class="empty-state"><div class="icon">🗓️</div>No engagements loaded yet.<br>Import your Google Sheet CSV below.</div>
+        <div class="empty-state"><div class="icon">⏳</div>Loading schedule…</div>
       </div>
     </div>
   </div>
@@ -390,19 +419,16 @@
   <div class="upcoming-panel">
     <div class="section-label">Upcoming Engagements</div>
     <div class="upcoming-list" id="upcoming-list">
-      <div class="empty-state" style="grid-column:1/-1;color:var(--muted);font-size:12px;text-align:center;padding:20px;">
-        Import data to see upcoming events
-      </div>
+      <div class="empty-state" style="grid-column:1/-1;text-align:center;padding:20px;">Loading…</div>
     </div>
   </div>
 
   <!-- SIDE -->
   <div class="side-panel">
-    <!-- Mini calendar -->
     <div class="mini-cal">
       <div class="mini-cal-header">
         <span class="mc-title" id="mc-title">Month Year</span>
-        <span style="font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace;" id="mc-count">— events</span>
+        <span class="mc-count-badge" id="mc-count">0 events</span>
       </div>
       <div class="mc-grid">
         <div class="mc-dow">
@@ -413,74 +439,110 @@
       </div>
     </div>
 
-    <!-- Summary -->
     <div class="section-label" style="margin-bottom:0">Monthly Overview</div>
     <div class="summary-cards">
       <div class="sum-card">
-        <div class="sum-icon">🤝</div>
-        <div class="sum-text">
-          <div class="sum-num" id="sum-meetings">0</div>
-          <div class="sum-lbl">Meetings</div>
-        </div>
+        <div class="sum-icon">📋</div>
+        <div class="sum-text"><div class="sum-num" id="sum-meetings">0</div><div class="sum-lbl">Meetings</div></div>
       </div>
       <div class="sum-card">
         <div class="sum-icon">🏗️</div>
-        <div class="sum-text">
-          <div class="sum-num" id="sum-visits">0</div>
-          <div class="sum-lbl">Site Visits</div>
-        </div>
+        <div class="sum-text"><div class="sum-num" id="sum-visits">0</div><div class="sum-lbl">Site Visits</div></div>
       </div>
       <div class="sum-card">
-        <div class="sum-icon">📋</div>
-        <div class="sum-text">
-          <div class="sum-num" id="sum-reviews">0</div>
-          <div class="sum-lbl">Reviews / Conf.</div>
-        </div>
+        <div class="sum-icon">📊</div>
+        <div class="sum-text"><div class="sum-num" id="sum-reviews">0</div><div class="sum-lbl">Reviews / Conf.</div></div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- IMPORT BAR -->
-<div class="import-bar">
-  <label>CSV URL</label>
-  <input type="text" id="csv-url" placeholder="Paste any Google Sheets URL (edit link, share link, or published CSV) — CORS proxy applied automatically">
-  <button class="btn" onclick="loadCSV()">⬇ Import</button>
-  <button class="btn-outline" onclick="loadSample()">Load Sample</button>
-  <span id="status-msg"></span>
+<div class="bottom-bar">
+  <span>🚂 &nbsp;Auto-syncs every 10 minutes from Google Sheets</span>
+  <button class="btn-sm" onclick="triggerReload()">⟳ Refresh Now</button>
+  <span class="reload-info" id="next-reload">Next sync: —</span>
 </div>
 
-<div class="track-bottom"></div>
-
 <script>
-// ── CLOCK ──────────────────────────────────────────────────────────────
-const MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const SMONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// ── CONSTANTS ──────────────────────────────────────────────────────────
+const MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const SMONTH  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const RELOAD_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 
 function pad(n){ return String(n).padStart(2,'0'); }
+
+// ── CLOCK ──────────────────────────────────────────────────────────────
+const NOW = new Date();
 function tickClock(){
   const n = new Date();
-  document.getElementById('clock').textContent =
-    `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
-  document.getElementById('date-display').textContent =
-    `${DAYS[n.getDay()]}, ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
+  document.getElementById('clock').textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  document.getElementById('date-display').textContent = `${DAYS[n.getDay()]}, ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
 }
 tickClock(); setInterval(tickClock,1000);
 
-// ── TODAY HEADER ──────────────────────────────────────────────────────
-const NOW = new Date();
-document.getElementById('hdr-day').textContent    = NOW.getDate();
+// Today header (static)
+document.getElementById('hdr-day').textContent     = NOW.getDate();
 document.getElementById('hdr-dayname').textContent = DAYS[NOW.getDay()];
 document.getElementById('hdr-monthyr').textContent = `${MONTHS[NOW.getMonth()]} ${NOW.getFullYear()}`;
 
-// ── DATA STORE ────────────────────────────────────────────────────────
-let events = []; // [{date:Date, time, title, location, type, priority}]
+// ── SYNC STATUS ────────────────────────────────────────────────────────
+function setSyncState(state, msg){
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot' + (state==='syncing' ? ' syncing' : state==='error' ? ' error' : '');
+  lbl.textContent = msg;
+}
 
-// ── CSV PARSER ───────────────────────────────────────────────────────
-// Expected columns (case-insensitive, any order):
-// Date | Time | Title | Location | Type | Priority
+// ── COUNTDOWN ──────────────────────────────────────────────────────────
+let nextReloadAt = null;
+function updateCountdown(){
+  if(!nextReloadAt) return;
+  const diff = Math.max(0, nextReloadAt - Date.now());
+  const m = Math.floor(diff/60000), s = Math.floor((diff%60000)/1000);
+  document.getElementById('next-reload').textContent = `Next sync: ${pad(m)}:${pad(s)}`;
+}
+setInterval(updateCountdown, 1000);
+
+// ── DATA STORE ────────────────────────────────────────────────────────
+let events = [];
+
+// ── DATE HELPERS ───────────────────────────────────────────────────────
+// Returns a local-midnight Date for comparisons — avoids timezone-offset issues
+function toLocalMidnight(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function todayMidnight() {
+  return toLocalMidnight(new Date());
+}
+
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear()
+      && a.getMonth()    === b.getMonth()
+      && a.getDate()     === b.getDate();
+}
+
+function sameMonth(a, b) {
+  return a.getFullYear() === b.getFullYear()
+      && a.getMonth()    === b.getMonth();
+}
+
+function startOfWeek(d) {
+  const c = new Date(d);
+  c.setDate(c.getDate() - c.getDay());
+  c.setHours(0,0,0,0);
+  return c;
+}
+
+function endOfWeek(d) {
+  const c = new Date(d);
+  c.setDate(c.getDate() + (6 - c.getDay()));
+  c.setHours(23,59,59,999);
+  return c;
+}
+
+// ── CSV PARSER ─────────────────────────────────────────────────────────
 function parseCSV(raw){
   const lines = raw.split(/\r?\n/).filter(l => l.trim());
   if(!lines.length) return [];
@@ -522,27 +584,95 @@ function splitCSVLine(line){
   result.push(cur); return result;
 }
 
+// ── FIX: parseDate always returns LOCAL midnight to avoid timezone drift ──
 function parseDate(s){
-  // Supports: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, MM/DD/YYYY
   s = s.trim();
   let m;
-  if((m=s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/))){
-    // Try DD/MM/YYYY first (Indian format)
-    const d=new Date(+m[3],+m[2]-1,+m[1]);
-    if(!isNaN(d)) return d;
+  // DD/MM/YYYY or DD-MM-YYYY
+  if((m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/))){
+    return new Date(+m[3], +m[2]-1, +m[1]); // local, no UTC offset
   }
-  if((m=s.match(/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})$/))){
-    return new Date(+m[1],+m[2]-1,+m[3]);
+  // YYYY/MM/DD or YYYY-MM-DD
+  if((m = s.match(/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})$/))){
+    return new Date(+m[1], +m[2]-1, +m[3]); // local, no UTC offset
   }
-  return new Date(s);
+  // MM/DD/YYYY (US format fallback)
+  if((m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))){
+    return new Date(+m[3], +m[1]-1, +m[2]);
+  }
+  // Last resort — parse string but normalise to midnight local
+  const raw = new Date(s);
+  if(!isNaN(raw)) return new Date(raw.getFullYear(), raw.getMonth(), raw.getDate());
+  return null;
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────
-function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
-function sameMonth(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth(); }
-function startOfWeek(d){ const c=new Date(d); c.setDate(c.getDate()-c.getDay()); return c; }
-function endOfWeek(d){ const c=new Date(d); c.setDate(c.getDate()+(6-c.getDay())); return c; }
+// ── URL UTILS ──────────────────────────────────────────────────────────
+function convertGSheetUrl(url){
+  if(!url || url.trim()==='YOUR_GOOGLE_SHEET_URL_HERE') return null;
+  if(url.includes('output=csv') || url.includes('pub?')) return url;
+  const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if(m){
+    const gid = (url.match(/[#&?]gid=(\d+)/)||[])[1] || '0';
+    return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
+  }
+  return url;
+}
 
+const PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+];
+
+async function fetchWithCORS(rawUrl){
+  try {
+    const r = await fetch(rawUrl, {signal: AbortSignal.timeout(6000)});
+    if(r.ok) return await r.text();
+  } catch(_){}
+  for(const proxy of PROXIES){
+    try {
+      const r = await fetch(proxy(rawUrl), {signal: AbortSignal.timeout(9000)});
+      if(r.ok){
+        const text = await r.text();
+        if(text.trim().startsWith('{"contents"')) return JSON.parse(text).contents;
+        return text;
+      }
+    } catch(_){}
+  }
+  throw new Error('All fetch attempts failed');
+}
+
+// ── LOAD & REFRESH ─────────────────────────────────────────────────────
+async function loadData(isAutoReload=false){
+  const url = convertGSheetUrl(SHEET_URL);
+
+  if(!url){
+    loadSample();
+    setSyncState('error', 'No sheet URL configured — showing sample data');
+    return;
+  }
+
+  setSyncState('syncing', isAutoReload ? 'Auto-syncing…' : 'Syncing…');
+  try {
+    const text = await fetchWithCORS(url);
+    events = parseCSV(text);
+    renderAll();
+    const t = new Date();
+    setSyncState('ok', `Last synced ${pad(t.getHours())}:${pad(t.getMinutes())}`);
+  } catch(e){
+    setSyncState('error', `Sync failed — ${e.message.slice(0,40)}`);
+    // Fall back to sample so the UI isn't empty
+    loadSample();
+  }
+  nextReloadAt = Date.now() + RELOAD_INTERVAL_MS;
+  updateCountdown();
+}
+
+function triggerReload(){ loadData(false); }
+
+// Auto-reload every 10 minutes
+setInterval(() => loadData(true), RELOAD_INTERVAL_MS);
+
+// ── RENDER ────────────────────────────────────────────────────────────
 function typeClass(t){
   const tl=(t||'').toLowerCase();
   if(tl.includes('meet')) return 'badge-meeting';
@@ -552,21 +682,26 @@ function typeClass(t){
   return 'badge-other';
 }
 function prioClass(p){ const pl=(p||'').toLowerCase(); if(pl==='high') return 'prio-high'; if(pl==='low') return 'prio-low'; return 'prio-med'; }
-function stripeColor(t){ const tl=(t||'').toLowerCase(); if(tl.includes('visit')||tl.includes('inspect')) return 'var(--green)'; if(tl.includes('conf')||tl.includes('seminar')) return 'var(--gold)'; if(tl.includes('review')||tl.includes('audit')) return 'var(--red)'; return 'var(--blue)'; }
+function stripeColor(t){ const tl=(t||'').toLowerCase(); if(tl.includes('visit')||tl.includes('inspect')) return 'var(--green)'; if(tl.includes('conf')||tl.includes('seminar')) return 'var(--gold-lt)'; if(tl.includes('review')||tl.includes('audit')) return 'var(--red)'; return 'var(--blue)'; }
 
 function renderAll(){
-  const today = NOW;
-  const todayEvts = events.filter(e=>sameDay(e.date,today)).sort((a,b)=>a.time.localeCompare(b.time));
-  const ws=startOfWeek(today), we=endOfWeek(today);
-  const weekEvts  = events.filter(e=>e.date>=ws && e.date<=we);
-  const monthEvts = events.filter(e=>sameMonth(e.date,today));
+  const today = new Date();
 
-  // Stats
+  // ── FIX: use sameDay() with the event's date for correct "today" matching ──
+  const todayEvts = events
+    .filter(e => sameDay(e.date, today))
+    .sort((a,b) => a.time.localeCompare(b.time));
+
+  const ws = startOfWeek(today);
+  const we = endOfWeek(today);
+  const weekEvts  = events.filter(e => e.date >= ws && e.date <= we);
+  const monthEvts = events.filter(e => sameMonth(e.date, today));
+
   document.getElementById('stat-today').textContent = todayEvts.length;
   document.getElementById('stat-week').textContent  = weekEvts.length;
   document.getElementById('stat-month').textContent = monthEvts.length;
 
-  // Today list
+  // ── Today list ──
   const tl = document.getElementById('today-list');
   if(!todayEvts.length){
     tl.innerHTML='<div class="empty-state"><div class="icon">✅</div>No engagements scheduled today.</div>';
@@ -582,12 +717,16 @@ function renderAll(){
       </div>`).join('');
   }
 
-  // Upcoming (next 6 events after today)
-  const upcoming = events.filter(e=>e.date>today && !sameDay(e.date,today))
-    .sort((a,b)=>a.date-b.date || a.time.localeCompare(b.time)).slice(0,6);
+  // ── Upcoming (strictly after today, not today) ──
+  const todayMid = todayMidnight();
+  const upcoming = events
+    .filter(e => toLocalMidnight(e.date) > todayMid)
+    .sort((a,b) => a.date - b.date || a.time.localeCompare(b.time))
+    .slice(0,6);
+
   const ul = document.getElementById('upcoming-list');
   if(!upcoming.length){
-    ul.innerHTML='<div class="empty-state" style="grid-column:1/-1;color:var(--muted);font-size:12px;text-align:center;padding:20px;">No upcoming engagements</div>';
+    ul.innerHTML='<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:20px;">No upcoming engagements</div>';
   } else {
     ul.innerHTML = upcoming.map(e=>`
       <div class="upcoming-card">
@@ -599,12 +738,10 @@ function renderAll(){
       </div>`).join('');
   }
 
-  // Summary
   document.getElementById('sum-meetings').textContent = monthEvts.filter(e=>(e.type||'').toLowerCase().includes('meet')).length;
   document.getElementById('sum-visits').textContent   = monthEvts.filter(e=>{const t=(e.type||'').toLowerCase();return t.includes('visit')||t.includes('inspect');}).length;
   document.getElementById('sum-reviews').textContent  = monthEvts.filter(e=>{const t=(e.type||'').toLowerCase();return t.includes('review')||t.includes('conf')||t.includes('seminar')||t.includes('audit');}).length;
 
-  // Mini calendar
   renderMiniCal(today, monthEvts);
 }
 
@@ -615,7 +752,6 @@ function renderMiniCal(today, monthEvts){
   const first = new Date(today.getFullYear(), today.getMonth(), 1);
   const last  = new Date(today.getFullYear(), today.getMonth()+1, 0);
   let html='';
-  // Leading blanks
   for(let i=0;i<first.getDay();i++) html+=`<div class="mc-day other-month"></div>`;
   for(let d=1;d<=last.getDate();d++){
     const isToday = d===today.getDate();
@@ -626,97 +762,36 @@ function renderMiniCal(today, monthEvts){
   document.getElementById('mc-days').innerHTML=html;
 }
 
-// ── LOAD CSV ──────────────────────────────────────────────────────────
-function setStatus(msg, ok=true){ const el=document.getElementById('status-msg'); el.textContent=msg; el.style.color=ok?'var(--green)':'var(--red)'; }
-
-// CORS proxy list — tried in order until one works
-const PROXIES = [
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://cors-anywhere.herokuapp.com/${url}`,
-];
-
-async function fetchWithCORS(rawUrl){
-  // 1. Try direct first (works when served from a real server)
-  try {
-    const r = await fetch(rawUrl, {signal: AbortSignal.timeout(5000)});
-    if(r.ok) return await r.text();
-  } catch(_){}
-
-  // 2. Try each proxy
-  for(const proxy of PROXIES){
-    try {
-      const r = await fetch(proxy(rawUrl), {signal: AbortSignal.timeout(8000)});
-      if(r.ok){
-        const text = await r.text();
-        // allorigins wraps JSON sometimes — unwrap if needed
-        if(text.trim().startsWith('{"contents"')){
-          return JSON.parse(text).contents;
-        }
-        return text;
-      }
-    } catch(_){}
-  }
-  throw new Error('All fetch attempts failed. Check the URL is a public published CSV link.');
-}
-
-async function loadCSV(){
-  const rawUrl = document.getElementById('csv-url').value.trim();
-  if(!rawUrl){ setStatus('Please enter a CSV URL', false); return; }
-
-  // Auto-convert "edit" Google Sheets URL → CSV export URL
-  const url = convertGSheetUrl(rawUrl);
-
-  setStatus('⏳ Fetching data…');
-  try {
-    const text = await fetchWithCORS(url);
-    events = parseCSV(text);
-    if(!events.length){ setStatus('⚠ No valid rows found — check column headers', false); return; }
-    renderAll();
-    setStatus(`✓ Loaded ${events.length} engagements`);
-  } catch(e){
-    setStatus(`✗ ${e.message}`, false);
-  }
-}
-
-// Convert regular Google Sheets share/edit URL to CSV export URL automatically
-function convertGSheetUrl(url){
-  // Already a CSV export or published link — leave as-is
-  if(url.includes('output=csv') || url.includes('pub?') || url.includes('corsproxy') || url.includes('allorigins')) return url;
-  // Pattern: https://docs.google.com/spreadsheets/d/SHEET_ID/edit...
-  const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-  if(m){
-    const gid = (url.match(/[#&?]gid=(\d+)/)||[])[1] || '0';
-    return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv&gid=${gid}`;
-  }
-  return url;
-}
-
-// ── SAMPLE DATA ───────────────────────────────────────────────────────
+// ── SAMPLE DATA ────────────────────────────────────────────────────────
 function loadSample(){
-  const y=NOW.getFullYear(), m=NOW.getMonth();
-  const d=(n,h=0,mi=0)=>new Date(y,m,n,h,mi);
+  const n = new Date();
+  const y=n.getFullYear(), mo=n.getMonth(), nd=n.getDate();
+  // Use local midnight dates to match parseDate behaviour
+  const d=(day,h=0,mi=0)=>{
+    const dt = new Date(y, mo, day);
+    return dt;
+  };
+  const t=(h,m)=> `${pad(h)}:${pad(m)}`;
   events=[
-    {date:d(NOW.getDate(),9,30),  time:'09:30',title:'Divisional Managers Briefing',location:'Conference Room A, HQ',type:'Meeting',priority:'high'},
-    {date:d(NOW.getDate(),11,0),  time:'11:00',title:'Infrastructure Review — Goods Shed Modernisation',location:'Yard Office',type:'Review',priority:'high'},
-    {date:d(NOW.getDate(),14,0),  time:'14:00',title:'Parliamentary Committee Interaction (Virtual)',location:'Video Conference',type:'Conference',priority:'med'},
-    {date:d(NOW.getDate(),16,30), time:'16:30',title:'Press Briefing — New Train Services',location:'Media Centre',type:'Other',priority:'med'},
-    {date:d(NOW.getDate()+1,10,0),time:'10:00',title:'Site Visit — Platform Expansion, Ambala',location:'Ambala Station',type:'Site Visit',priority:'high'},
-    {date:d(NOW.getDate()+2,9,0), time:'09:00',title:'Safety Audit — Loco Maintenance Depot',location:'Ludhiana Depot',type:'Review',priority:'high'},
-    {date:d(NOW.getDate()+3,11,30),time:'11:30',title:'Staff Welfare Meeting',location:'Training Institute, Chandigarh',type:'Meeting',priority:'low'},
-    {date:d(NOW.getDate()+4,9,0), time:'09:00',title:'Zonal Railway Conference, New Delhi',location:'Rail Bhawan, New Delhi',type:'Conference',priority:'high'},
-    {date:d(NOW.getDate()+5,15,0),time:'15:00',title:'Inauguration — Passenger Amenities Upgrade',location:'Jalandhar City Station',type:'Site Visit',priority:'med'},
-    {date:d(NOW.getDate()+7,10,30),time:'10:30',title:'Review of Revenue Performance — Q3',location:'HQ Board Room',type:'Review',priority:'high'},
-    {date:d(NOW.getDate()+9,14,0),time:'14:00',title:'Workshop: Cybersecurity in Railway IT',location:'IRISET, Secunderabad',type:'Conference',priority:'low'},
-    {date:d(NOW.getDate()+12,9,0),time:'09:00',title:'Bridge Inspection — Beas River',location:'Beas, Punjab',type:'Site Visit',priority:'med'},
-    {date:d(NOW.getDate()-2,11,0),time:'11:00',title:'CRB Video Conference',location:'Video Conference',type:'Meeting',priority:'high'},
+    {date:d(nd),   time:t(9,30), title:'Divisional Managers Briefing',                  location:'Conference Room A, HQ',         type:'Meeting',   priority:'high'},
+    {date:d(nd),   time:t(11,0), title:'Infrastructure Review — Goods Shed Modernisation',location:'Yard Office',                   type:'Review',    priority:'high'},
+    {date:d(nd),   time:t(14,0), title:'Parliamentary Committee Interaction (Virtual)',  location:'Video Conference',               type:'Conference',priority:'med'},
+    {date:d(nd),   time:t(16,30),title:'Press Briefing — New Train Services',            location:'Media Centre',                   type:'Other',     priority:'med'},
+    {date:d(nd+1), time:t(10,0), title:'Site Visit — Platform Expansion, Ambala',        location:'Ambala Station',                 type:'Site Visit',priority:'high'},
+    {date:d(nd+2), time:t(9,0),  title:'Safety Audit — Loco Maintenance Depot',          location:'Ludhiana Depot',                 type:'Review',    priority:'high'},
+    {date:d(nd+3), time:t(11,30),title:'Staff Welfare Meeting',                          location:'Training Institute, Chandigarh', type:'Meeting',   priority:'low'},
+    {date:d(nd+4), time:t(9,0),  title:'Zonal Railway Conference, New Delhi',             location:'Rail Bhawan, New Delhi',         type:'Conference',priority:'high'},
+    {date:d(nd+5), time:t(15,0), title:'Inauguration — Passenger Amenities Upgrade',     location:'Jalandhar City Station',          type:'Site Visit',priority:'med'},
+    {date:d(nd+7), time:t(10,30),title:'Review of Revenue Performance — Q3',             location:'HQ Board Room',                  type:'Review',    priority:'high'},
+    {date:d(nd+9), time:t(14,0), title:'Workshop: Cybersecurity in Railway IT',           location:'IRISET, Secunderabad',            type:'Conference',priority:'low'},
+    {date:d(nd+12),time:t(9,0),  title:'Bridge Inspection — Beas River',                 location:'Beas, Punjab',                   type:'Site Visit',priority:'med'},
   ];
   renderAll();
-  setStatus(`✓ Sample data loaded (${events.length} engagements)`);
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────
-renderAll(); // renders empty state
+// ── INIT ───────────────────────────────────────────────────────────────
+renderMiniCal(new Date(), []);
+loadData(false);
 </script>
 </body>
 </html>
